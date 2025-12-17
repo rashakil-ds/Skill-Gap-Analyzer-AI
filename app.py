@@ -14,16 +14,17 @@ load_dotenv()
 st.set_page_config(page_title="CV Skill Gap Analyzer", layout="centered")
 st.title("Skill Gap Analyzer AI")
 st.caption(
-    "Upload your CV, choose a target role, and get an AI-powered skill gap analysis with a personalized learning roadmap. It is an end-to-end GenAI application using RAG, Vector Databases, and LLMs to help candidates stay job-ready."
+    "Upload your CV and target role to get an intelligent skill gap assessment and a customized AI-focused learning roadmap powered by Generative AI."
 )
 
 COMMON_ROLES = [
     "Select a role",
-    "Data Analyst",
+    "Data/BI Analyst",
     "Data Scientist",
     "Data Engineer",
     "ML Engineer",
-    "GenAI Engineer",
+    "AI Engineer"
+    "GenAI/NLP Engineer",
 ]
 
 st.subheader("Inputs")
@@ -161,3 +162,17 @@ if analyze_clicked:
                 st.write(f"- {r}")
 
     st.caption(f"Generated at {now_ts()}")
+
+#about me
+st.divider()
+st.markdown(
+    """
+    <div style="text-align: left; font-size: 0.50rem; color: #6c757d;">
+        Developed by 
+        <a href="https://www.linkedin.com/in/kmrashedulalam/" target="_blank" style="color: #0f5132; text-decoration: none; font-weight: 600;">
+            Rashedul Alam
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)

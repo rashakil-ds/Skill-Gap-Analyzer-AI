@@ -1,69 +1,112 @@
 import os
+import json
+from typing import Dict, List, Any
+
 from groq import Groq
 
-DEFAULT_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 
-def _client() -> Groq:
-    key = os.getenv("GROQ_API_KEY")
-    if not key:
-        raise RuntimeError("Missing GROQ_API_KEY")
-    return Groq(api_key=key)
+def _safe_join(items) -> str:
+    if not items:
+        return ""
+    if isinstance(items, (set, tuple)):
+        items = list(items)
+    return ", ".join([str(x) for x in items if str(x).strip()])
+
+
+def _truncate(text: str, max_chars: int) -> str:
+    if not text:
+        return ""
+    text = text.strip()
+    return text[:max_chars]
+
 
 def generate_gap_report(
     target_role: str,
-    matched: list[str],
-    missing: list[str],
-    cv_skill_evidence: dict,
-    role_scope: dict,
+    matched: List[str],
+    missing: List[str],
+    cv_skill_evidence: Dict[str, Dict[str, Any]],
+    role_scope: Dict[str, Any],
     playbook_snippets: str = "",
+    roadmap_snippets: str = "",
+    instructions: str = "",
 ) -> str:
-    client = _client()
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("Missing GROQ_API_KEY. Add it to .env (local) or Streamlit Secrets (cloud).")
 
+    model = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile").strip()
+
+    client = Groq(api_key=api_key)
+
+    core = sorted(list(role_scope.get("core", [])))
+    optional = sorted(list(role_scope.get("optional", [])))
+    exclude = sorted(list(role_scope.get("exclude", [])))
+    role_file = role_scope.get("source")
+
+    evidence_lines = []
     top_skills = sorted(
         cv_skill_evidence.items(),
-        key=lambda x: (-x[1].get("score", 0), x[0].lower()),
-    )[:10]
+        key=lambda x: (-int(x[1].get("score", 0)), -int(x[1].get("mentions", 0)), x[0].lower()),
+    )[:18]
 
-    top_skills_text = "\n".join(
-        [f"- {k} (score={v.get('score')}, mentions={v.get('mentions')})" for k, v in top_skills]
+    for skill, info in top_skills:
+        ev = info.get("evidence", [])
+        if isinstance(ev, list):
+            ev = " | ".join(ev[:2])
+        evidence_lines.append(f"- {skill} (score={info.get('score')}, mentions={info.get('mentions')}): {ev}")
+
+    cv_evidence_block = "\n".join(evidence_lines)
+
+    playbook_snippets = _truncate(playbook_snippets, 3000)
+    roadmap_snippets = _truncate(roadmap_snippets, 3000)
+    instructions = _truncate(instructions, 1200)
+
+    system_msg = (
+        "You are an expert career coach and hiring-aligned skill gap analyst. "
+        "You must be role-specific and avoid recommending irrelevant skills."
     )
 
-    core = sorted(list(role_scope.get("core", set())))[:40]
-    optional = sorted(list(role_scope.get("optional", set())))[:40]
+    user_msg = f"""
+ROLE
+- Target role: {target_role}
+- Role file used: {role_file if role_file else "None"}
 
-    prompt = f"""
-You are a career coach and hiring-aligned advisor.
+ROLE SCOPE (authoritative)
+- Core skills: {_safe_join(core)}
+- Optional skills: {_safe_join(optional)}
+- Excluded skills (do not recommend): {_safe_join(exclude)}
 
-Target role: {target_role}
+GAP SIGNALS
+- Matched skills: {_safe_join(matched)}
+- Missing skills: {_safe_join(missing)}
 
-Candidate CV (extracted skills summary):
-Top skills:
-{top_skills_text}
+CV EVIDENCE (top extracted)
+{cv_evidence_block}
 
-Matched target skills:
-{', '.join(matched) if matched else 'None'}
+RETRIEVED PLAYBOOK CONTEXT
+{playbook_snippets}
 
-Missing target skills:
-{', '.join(missing) if missing else 'None'}
+RETRIEVED ROADMAP CONTEXT
+{roadmap_snippets}
 
-Role scope:
-Core skills: {', '.join(core) if core else 'Not provided'}
-Optional skills: {', '.join(optional) if optional else 'Not provided'}
+ADDITIONAL INSTRUCTIONS
+{instructions}
 
-Reference playbooks (grounding, do not invent resources):
-{playbook_snippets if playbook_snippets else 'No playbooks provided'}
+TASK
+1) Give a short role-specific gap explanation (do not mention excluded skills as gaps).
+2) Provide a prioritized 4-week learning plan aligned to the role scope.
+3) Suggest 2 portfolio projects to prove the missing core skills (role-relevant).
+4) Keep output professional and structured with headings and bullet points.
+""".strip()
 
-Write:
-1) Gap explanation (6-10 lines, role-specific)
-2) Prioritized learning plan (4 weeks, week-wise)
-3) 2 portfolio projects aligned with missing skills
-Keep it practical and concise.
-"""
-
-    r = client.chat.completions.create(
-        model=DEFAULT_MODEL,
-        messages=[{"role": "user", "content": prompt}],
+    resp = client.chat.completions.create(
+        model=model,
         temperature=0.2,
         max_tokens=900,
+        messages=[
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg},
+        ],
     )
-    return r.choices[0].message.content
+
+    return resp.choices[0].message.content.strip()

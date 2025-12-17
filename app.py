@@ -13,6 +13,9 @@ load_dotenv()
 
 st.set_page_config(page_title="CV Skill Gap Analyzer", layout="centered")
 st.title("Skill Gap Analyzer AI")
+st.caption(
+    "Upload your CV, choose a target role, and get an AI-powered skill gap analysis with a personalized learning roadmap. It is an end-to-end GenAI application using RAG, Vector Databases, and LLMs to help candidates stay job-ready."
+)
 
 COMMON_ROLES = [
     "Select a role",
@@ -25,15 +28,15 @@ COMMON_ROLES = [
 
 st.subheader("Inputs")
 
-cv_file = st.file_uploader("Upload your CV", type=["pdf", "docx"])
+cv_file = st.file_uploader("Upload your CV *", type=["pdf", "docx"])
 
 selected_role = st.selectbox("Choose a common role (optional)", COMMON_ROLES)
-custom_role = st.text_input("Or enter a custom job position", placeholder="e.g., Analytics Engineer")
+custom_role = st.text_input("Or, Enter a custom job position", placeholder="e.g., Software Engineer (Machine Learning) / Analytics Engineer")
 
 use_jd = st.checkbox("I have a job description (recommended)")
 job_description = ""
 if use_jd:
-    job_description = st.text_area("Job description from job post", height=220, placeholder="Paste full job description...")
+    job_description = st.text_area("Job description from job post:", height=220, placeholder="Paste full job description...")
 
 def resolve_target_role(selected, custom):
     if custom.strip():
@@ -44,6 +47,27 @@ def resolve_target_role(selected, custom):
 
 target_role = resolve_target_role(selected_role, custom_role)
 st.caption(f"Analyzing for role: **{target_role if target_role else '—'}**")
+
+#button
+st.markdown(
+    """
+    <style>
+    div.stButton > button {
+        background-color: #0f5132;   /* dark green */
+        color: white;
+        border-radius: 8px;
+        padding: 0.6em 1.2em;
+        font-weight: 600;
+        border: none;
+    }
+    div.stButton > button:hover {
+        background-color: #198754;   /* lighter green on hover */
+        color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 analyze_clicked = st.button("Analyze Skill Gap", type="primary", use_container_width=True)
 
@@ -59,16 +83,16 @@ if analyze_clicked:
         st.stop()
 
     with st.spinner("Processing your CV and analyzing skill gaps..."):
-        # 1) Parse CV
+        #Parse CV
         cv_text = extract_text_from_upload(cv_file)
 
-        # 2) Build/Load vector DB (roles + playbooks)
+        #Build/Load vector DB (roles + playbooks)
         vectordb = get_or_build_vectordb()
 
-        # 3) Skill extraction from CV (evidence scoring)
+        #Skill extraction from CV (evidence scoring)
         cv_profile = extract_skills_with_evidence(cv_text)
 
-        # 4) Retrieve requirements via RAG
+        #Retrieve requirements via RAG
         role_key = normalize_role_name(target_role)
         rag_query = f"Role: {target_role}\nFind required skills, tools, and responsibilities.\n"
         if use_jd:
@@ -76,27 +100,27 @@ if analyze_clicked:
         docs = rag_retrieve(vectordb, rag_query, filters={"type": "role"})  # role docs
         playbooks = rag_retrieve(vectordb, "Provide learning playbooks for missing skills.", filters={"type": "playbook"})
 
-        # 5) Extract required skills from retrieved role docs
+        #Extract required skills from retrieved role docs
         required_skills = set()
         for d in docs:
             required_skills |= set(d.metadata.get("skills", "").split("|")) if d.metadata.get("skills") else set()
 
         required_skills = {s.strip() for s in required_skills if s.strip()}
 
-        # If no embedded metadata found (custom role), fallback:
+        #If no embedded metadata found (custom role), fallback:
         if not required_skills:
-            # retrieve more generally
+            #retrieve more generally
             docs = rag_retrieve(vectordb, f"{target_role} required skills tools stack", filters={"type": "role"})
             for d in docs:
                 required_skills |= set(d.metadata.get("skills", "").split("|")) if d.metadata.get("skills") else set()
             required_skills = {s.strip() for s in required_skills if s.strip()}
 
-        # 6) Gap analysis
+        #Gap analysis
         cv_skills = set(cv_profile["skills"].keys())
         missing = sorted(list(required_skills - cv_skills))
         matched = sorted(list(required_skills & cv_skills))
 
-        # 7) Roadmap generation (rule-based + playbook snippets)
+        #Roadmap generation (rule-based + playbook snippets)
         roadmap = build_roadmap(missing, playbooks)
 
     st.success("Analysis complete!")

@@ -14,7 +14,7 @@ __pycache__/
 .idea/
 .DS_Store
 
-#Large / Non-Versioned Data
+#Large, Non-Versioned Data
 data/**/*.pdf
 data/**/*.csv
 data/**/*.json

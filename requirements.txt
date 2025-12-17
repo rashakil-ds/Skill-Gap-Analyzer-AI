@@ -1,0 +1,14 @@
+streamlit
+python-dotenv
+pandas
+
+pdfplumber
+python-docx
+
+langchain
+langchain-community
+langchain-text-splitters
+chromadb
+sentence-transformers
+torch
+

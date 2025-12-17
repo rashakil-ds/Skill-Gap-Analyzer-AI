@@ -1,0 +1,21 @@
+#Vector Database
+.chroma/
+
+#Python Cache
+__pycache__/
+*.pyc
+
+#Environment Files
+.env
+.env.*
+
+#IDE / OS Files
+.vscode/
+.idea/
+.DS_Store
+
+#Large / Non-Versioned Data
+data/**/*.pdf
+data/**/*.csv
+data/**/*.json
+data/**/*.parquet

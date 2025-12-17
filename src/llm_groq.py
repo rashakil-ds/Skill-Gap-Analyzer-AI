@@ -36,7 +36,8 @@ def generate_gap_report(
 
     #model = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile").strip()
     #model = os.getenv("GROQ_MODEL", "llama3-70b-8192").strip()
-    model = os.getenv("GROQ_MODEL", "qwen-qwq-32b").strip()
+    #model = os.getenv("GROQ_MODEL", "qwen-qwq-32b").strip() #good
+    model = os.getenv("GROQ_MODEL", "deepseek-r1-distill-llama-70b").strip()
 
     client = Groq(api_key=api_key)
 

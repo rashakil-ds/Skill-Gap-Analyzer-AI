@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 from typing import Dict, List, Set
-from langchain.schema import Document 
+from langchain_core.documents import Document
 
 SKILL_PATTERNS: Dict[str, List[str]] = {
     "Python": [r"\bpython\b"],

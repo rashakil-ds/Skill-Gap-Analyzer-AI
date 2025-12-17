@@ -1,13 +1,15 @@
 import re
 
-# Small but strong baseline dictionary (extend anytime)
+#Baseline dictionary
 SKILL_PATTERNS = {
-    # core
+
+    #core
     "Python": [r"\bpython\b"],
     "SQL": [r"\bsql\b", r"\bpostgres\b", r"\bmysql\b", r"\btsql\b"],
     "Git": [r"\bgit\b", r"github", r"gitlab"],
     "Docker": [r"\bdocker\b"],
     "Linux": [r"\blinux\b", r"\bbash\b", r"\bshell\b"],
+
     # data
     "Pandas": [r"\bpandas\b"],
     "NumPy": [r"\bnumpy\b"],
@@ -17,11 +19,13 @@ SKILL_PATTERNS = {
     "Airflow": [r"\bairflow\b"],
     "dbt": [r"\bdbt\b"],
     "Kafka": [r"\bkafka\b"],
+
     # ml / dl
     "Scikit-learn": [r"scikit[- ]learn", r"\bsklearn\b"],
     "PyTorch": [r"\bpytorch\b", r"\btorch\b"],
     "TensorFlow": [r"\btensorflow\b"],
     "Transformers": [r"\btransformers\b", r"hugging\s?face"],
+    
     # genai
     "RAG": [r"\brag\b", r"retrieval[- ]augmented"],
     "Embeddings": [r"\bembedding", r"\bembeddings\b"],
@@ -65,7 +69,7 @@ def extract_skills_with_evidence(text: str) -> dict:
                 mentions += len(hits)
 
         if mentions > 0:
-            # Very simple evidence: keep some matching lines
+            #Very simple evidence: keep some matching lines
             lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
             matched_lines = []
             for ln in lines:

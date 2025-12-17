@@ -22,4 +22,4 @@ def extract_text_from_upload(uploaded_file) -> str:
         return extract_text_from_pdf(b)
     if name.endswith(".docx"):
         return extract_text_from_docx(b)
-    raise ValueError("Unsupported file type. Please upload .pdf or .docs.")
+    raise ValueError("Unsupported file type. Please upload .pdf or .docx.")

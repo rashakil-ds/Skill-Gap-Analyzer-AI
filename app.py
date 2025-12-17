@@ -12,7 +12,7 @@ from src.utils import now_ts
 load_dotenv()
 
 st.set_page_config(page_title="CV Skill Gap Analyzer", layout="centered")
-st.title("Skill Gap Analyzer AI")
+st.title("Skill Gap Analyzer")
 st.caption(
     "Upload your CV and target role to get an intelligent skill gap assessment and a customized AI-focused learning roadmap powered by Generative AI."
 )
@@ -25,14 +25,15 @@ COMMON_ROLES = [
     "ML Engineer",
     "AI Engineer",
     "GenAI/NLP Engineer",
+    "Software Engineer, ML/AI",
 ]
 
 st.subheader("Inputs")
 
-cv_file = st.file_uploader("Upload your CV *", type=["pdf", "docx"])
+cv_file = st.file_uploader("Upload your CV/Resume *", type=["pdf", "docx"])
 
 selected_role = st.selectbox("Choose a common role (optional)", COMMON_ROLES)
-custom_role = st.text_input("Or, Enter a custom job position", placeholder="e.g., Software Engineer (Machine Learning) / Analytics Engineer")
+custom_role = st.text_input("Or, Enter a custom job position", placeholder="e.g., Analytics Engineer")
 
 use_jd = st.checkbox("I have a job description (recommended)")
 job_description = ""
@@ -49,7 +50,7 @@ def resolve_target_role(selected, custom):
 target_role = resolve_target_role(selected_role, custom_role)
 st.caption(f"Analyzing for role: **{target_role if target_role else '—'}**")
 
-#button
+#submit button
 st.markdown(
     """
     <style>
@@ -72,6 +73,7 @@ st.markdown(
 
 analyze_clicked = st.button("Analyze Skill Gap", type="primary", use_container_width=True)
 
+#user guide
 if analyze_clicked:
     if not cv_file:
         st.error("Please upload your CV.")

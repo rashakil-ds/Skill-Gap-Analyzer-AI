@@ -35,7 +35,8 @@ def generate_gap_report(
         raise RuntimeError("Missing GROQ_API_KEY. Add it to .env (local) or Streamlit Secrets (cloud).")
 
     #model = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile").strip()
-    model = os.getenv("GROQ_MODEL", "llama3-70b-8192").strip()
+    #model = os.getenv("GROQ_MODEL", "llama3-70b-8192").strip()
+    model = os.getenv("GROQ_MODEL", "qwen-qwq-32b").strip()
 
     client = Groq(api_key=api_key)
 

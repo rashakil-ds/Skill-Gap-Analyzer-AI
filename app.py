@@ -23,7 +23,7 @@ COMMON_ROLES = [
     "Data Scientist",
     "Data Engineer",
     "ML Engineer",
-    "AI Engineer"
+    "AI Engineer",
     "GenAI/NLP Engineer",
 ]
 

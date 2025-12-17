@@ -32,13 +32,14 @@ def _attach_skill_metadata(doc: Document) -> Document:
         if line.strip().lower().startswith("skills:"):
             skills = line.split(":", 1)[1].strip()
             break
-    # normalize to pipe-separated
+    #normalize to pipe-separated
     if skills:
         skills = "|".join([s.strip() for s in skills.split(",") if s.strip()])
         doc.metadata["skills"] = skills
     return doc
 
 def get_or_build_vectordb():
+    #sentence embedding model. Used for semantic similarity search
     embed_model = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
     embeddings = HuggingFaceEmbeddings(model_name=embed_model)
 

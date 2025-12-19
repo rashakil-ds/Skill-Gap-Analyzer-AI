@@ -1,9 +1,7 @@
 import os
 import json
 from typing import Dict, List, Any
-
 from groq import Groq
-
 
 def _safe_join(items) -> str:
     if not items:
@@ -12,13 +10,11 @@ def _safe_join(items) -> str:
         items = list(items)
     return ", ".join([str(x) for x in items if str(x).strip()])
 
-
 def _truncate(text: str, max_chars: int) -> str:
     if not text:
         return ""
     text = text.strip()
     return text[:max_chars]
-
 
 def generate_gap_report(
     target_role: str,
@@ -70,6 +66,7 @@ def generate_gap_report(
     )
 
     user_msg = f"""
+
 ROLE
 - Target role: {target_role}
 - Role file used: {role_file if role_file else "None"}

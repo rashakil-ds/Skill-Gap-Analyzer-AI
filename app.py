@@ -252,16 +252,16 @@ if analyze_clicked:
             except Exception as e:
                 llm_report = "LLM insights are temporarily unavailable.\n\nReason: " + str(e)
 
-    st.success("Analysis complete")
+    st.success("Analysis complete :)")
 
-    st.subheader("LLM Insights")
+    st.subheader("LLM Insights:")
     st.write(llm_report if llm_report else "LLM insights were skipped.")
 
-    with st.expander("Role scope used"):
-        st.write("Role file:", role_scope["source"])
-        st.write("Core:", sorted(role_scope["core"]))
-        st.write("Optional:", sorted(role_scope["optional"]))
-        st.write("Excluded:", sorted(role_scope["exclude"]))
+    #with st.expander("Role scope used"):
+        #st.write("Role file:", role_scope["source"])
+        #st.write("Core:", sorted(role_scope["core"]))
+        #st.write("Optional:", sorted(role_scope["optional"]))
+        #st.write("Excluded:", sorted(role_scope["exclude"]))
 
     st.subheader("Missing Skills")
     st.write(", ".join(missing) if missing else "No missing core skills detected.")

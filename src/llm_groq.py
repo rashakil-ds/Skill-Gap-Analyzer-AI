@@ -94,9 +94,13 @@ ADDITIONAL INSTRUCTIONS
 
 TASK
 1) Give a short role-specific gap explanation (do not mention excluded skills as gaps).
-2) Provide a prioritized 4-week learning plan aligned to the role scope.
-3) Suggest 2 portfolio projects to prove the missing core skills (role-relevant).
+2) Provide a prioritized 4-month learning roadmap.
+   - Break it down by Month 1, Month 2, Month 3, Month 4
+   - Each month should include goals, key topics, and practical outcomes to implement a project.
+3) Suggest top 4 portfolio projects to prove the missing core skills (role-relevant) and mention project name, required end-to-end tools, and mention why it is important for resume.
 4) Keep output professional and structured with headings and bullet points.
+5) Write a motivational conclusion (very smart) encouraging the user to take related action as soon as possible.
+6) Based on the CV, suggest which other job roles (2–4) the user is currently best suited for, and explain why.
 """.strip()
 
     resp = client.chat.completions.create(

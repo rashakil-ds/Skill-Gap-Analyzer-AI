@@ -252,7 +252,7 @@ if analyze_clicked:
             except Exception as e:
                 llm_report = "LLM insights are temporarily unavailable.\n\nReason: " + str(e)
 
-    st.success("Analysis complete :)")
+    st.success("Analysis complete 😊")
 
     st.subheader("LLM Insights:")
     st.write(llm_report if llm_report else "LLM insights were skipped.")
